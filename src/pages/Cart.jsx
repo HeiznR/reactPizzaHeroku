@@ -1,16 +1,46 @@
 import React from 'react';
-import { useSelector } from 'react-redux';
-import { CartItem } from '../components';
+import { useSelector, useDispatch } from 'react-redux';
+import { Link } from 'react-router-dom';
+
+import cartEmptyImage from '../assets/img/empty-cart.png';
+import { CartItem, Button } from '../components';
+import { clearCart, removeCartItem, plusCartItem, minusCartItem } from '../redux/actions/cart';
 
 function Cart() {
+  const dispatch = useDispatch();
   const { totalPrice, totalCount, items } = useSelector(({ cart }) => cart);
-  //пробегаемся по ключам в item и из каждого ключа(который является массивом) вытаскиваем 1 обьект
+
   const addedPizzas = Object.keys(items).map((key) => {
     return items[key].items[0];
   });
+
+  const onClearCart = () => {
+    if (window.confirm('Вы действительно хотите очистить корзину?')) {
+      dispatch(clearCart());
+    }
+  };
+
+  const onRemoveItem = (id) => {
+    if (window.confirm('Вы действительно хотите удалить?')) {
+      dispatch(removeCartItem(id));
+    }
+  };
+
+  const onPlusItem = (id) => {
+    dispatch(plusCartItem(id));
+  };
+
+  const onMinusItem = (id) => {
+    dispatch(minusCartItem(id));
+  };
+
+  const onClickOrder = () => {
+    console.log('ВАШ ЗАКАЗ', items);
+  };
+
   return (
-    <div className="content">
-      <div className="container container--cart">
+    <div className="container container--cart">
+      {totalCount ? (
         <div className="cart">
           <div className="cart__top">
             <h2 className="content__title">
@@ -81,28 +111,32 @@ function Cart() {
                 />
               </svg>
 
-              <span>Очистить корзину</span>
+              <span onClick={onClearCart}>Очистить корзину</span>
             </div>
           </div>
           <div className="content__items">
-            {addedPizzas.map((item) => (
+            {addedPizzas.map((obj) => (
               <CartItem
-                name={item.name}
-                type={item.type}
-                size={item.size}
-                price={items[item.id].totalPrice}
+                key={obj.id}
+                id={obj.id}
+                name={obj.name}
+                type={obj.type}
+                size={obj.size}
+                totalPrice={items[obj.id].totalPrice}
+                totalCount={items[obj.id].items.length}
+                onRemove={onRemoveItem}
+                onMinus={onMinusItem}
+                onPlus={onPlusItem}
               />
             ))}
           </div>
           <div className="cart__bottom">
             <div className="cart__bottom-details">
               <span>
-                {' '}
-                Всего пицц: <b>{totalCount} шт.</b>{' '}
+                Всего пицц: <b>{totalCount} шт.</b>
               </span>
               <span>
-                {' '}
-                Сумма заказа: <b>{totalPrice} ₽</b>{' '}
+                Сумма заказа: <b>{totalPrice} ₽</b>
               </span>
             </div>
             <div className="cart__bottom-buttons">
@@ -121,16 +155,32 @@ function Cart() {
                     strokeLinejoin="round"
                   />
                 </svg>
-
-                <span>Вернуться назад</span>
+                <Link to="/">
+                  <span>Вернуться назад</span>
+                </Link>
               </a>
-              <div className="button pay-btn">
+              <Button onClick={onClickOrder} className="pay-btn">
                 <span>Оплатить сейчас</span>
-              </div>
+              </Button>
             </div>
           </div>
         </div>
-      </div>
+      ) : (
+        <div className="cart cart--empty">
+          <h2>
+            Корзина пустая <i>😕</i>
+          </h2>
+          <p>
+            Вероятней всего, вы не заказывали ещё пиццу.
+            <br />
+            Для того, чтобы заказать пиццу, перейди на главную страницу.
+          </p>
+          <img src={cartEmptyImage} alt="Empty cart" />
+          <Link to="/" className="button button--black">
+            <span>Вернуться назад</span>
+          </Link>
+        </div>
+      )}
     </div>
   );
 }

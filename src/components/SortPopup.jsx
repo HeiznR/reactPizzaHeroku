@@ -1,37 +1,38 @@
-import React, { useState, useRef } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 
 const SortPopup = React.memo(function SortPopup({ items, activeSortType, onClickSortType }) {
-  const [visiblePopup, setVisiblePopup] = useState(false); //useState для высветления Popup
-  const sortRef = useRef(null); //переменная для извлечения пути в React
-  const activeLabel = items.find((obj) => obj.type === activeSortType).name; //переменная для отображения выбранного пункта в popup
+  const [visiblePopup, setVisiblePopup] = React.useState(false);
+  const sortRef = React.useRef();
+  const activeLabel = items.find((obj) => obj.type === activeSortType).name;
 
   const toggleVisiblePopup = () => {
-    setVisiblePopup(!visiblePopup); //функция, которая скрывает и отображает popup
+    setVisiblePopup(!visiblePopup);
   };
 
-  const handleOutsidePopupClick = (event) => {
+  const handleOutsideClick = (event) => {
     const path = event.path || (event.composedPath && event.composedPath());
     if (!path.includes(sortRef.current)) {
-      //если клик за пределом Popup, то скрыть появившийся список
       setVisiblePopup(false);
     }
   };
 
-  React.useEffect(() => {
-    document.body.addEventListener('click', handleOutsidePopupClick); //хук useEffect выполняется после рендера страницы
-  }, []);
-
   const onSelectItem = (index) => {
     if (onClickSortType) {
       onClickSortType(index);
-    } //Функция вызывающая ререндер страницы и выделяющая выбранный елемент
+    }
     setVisiblePopup(false);
   };
+
+  React.useEffect(() => {
+    document.body.addEventListener('click', handleOutsideClick);
+  }, []);
 
   return (
     <div ref={sortRef} className="sort">
       <div className="sort__label">
         <svg
+          className={visiblePopup ? 'rotated' : ''}
           width="10"
           height="6"
           viewBox="0 0 10 6"
@@ -48,19 +49,30 @@ const SortPopup = React.memo(function SortPopup({ items, activeSortType, onClick
       {visiblePopup && (
         <div className="sort__popup">
           <ul>
-            {items.map((item, index) => (
-              <li
-                className={activeSortType === item.type ? 'active' : ''}
-                onClick={() => onSelectItem(item)}
-                key={`${item.type}_${index}`}>
-                {item.name}
-              </li>
-            ))}
+            {items &&
+              items.map((obj, index) => (
+                <li
+                  onClick={() => onSelectItem(obj)}
+                  className={activeSortType === obj.type ? 'active' : ''}
+                  key={`${obj.type}_${index}`}>
+                  {obj.name}
+                </li>
+              ))}
           </ul>
         </div>
       )}
     </div>
   );
 });
+
+SortPopup.propTypes = {
+  activeSortType: PropTypes.string.isRequired,
+  items: PropTypes.arrayOf(PropTypes.object).isRequired,
+  onClickSortType: PropTypes.func.isRequired,
+};
+
+SortPopup.defaultProps = {
+  items: [],
+};
 
 export default SortPopup;
