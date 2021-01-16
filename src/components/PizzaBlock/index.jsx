@@ -4,7 +4,7 @@ import classNames from 'classnames';
 import Button from '../Button';
 
 function PizzaBlock({ id, name, imageUrl, price, types, sizes, onClickAddPizza, addedCount }) {
-  const availableTypes = ['cienkie', 'tradycyjne'];
+  const availableTypes = ['Cienkie', 'Tradycyjne'];
   const availableSizes = [26, 30, 40];
 
   const [activeType, setActiveType] = React.useState(types[0]);
@@ -63,7 +63,7 @@ function PizzaBlock({ id, name, imageUrl, price, types, sizes, onClickAddPizza, 
         </ul>
       </div>
       <div className="pizza-block__bottom">
-        <div className="pizza-block__price">щв {price} zl</div>
+        <div className="pizza-block__price">od {price} zl</div>
         <Button onClick={onAddPizza} className="button--add" outline>
           <svg
             width="12"
