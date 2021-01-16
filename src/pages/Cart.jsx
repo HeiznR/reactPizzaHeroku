@@ -140,7 +140,7 @@ function Cart() {
               </span>
             </div>
             <div className="cart__bottom-buttons">
-              <a href="/" className="button button--outline button--add go-back-btn">
+              <Link to="/" outline className="button button--add go-back-btn">
                 <svg
                   width="8"
                   height="14"
@@ -155,10 +155,10 @@ function Cart() {
                     strokeLinejoin="round"
                   />
                 </svg>
-                <Link to="/">
-                  <span>Wróć</span>
-                </Link>
-              </a>
+
+                <span>Wróć</span>
+              </Link>
+
               <Button onClick={onClickOrder} className="pay-btn">
                 <span>Zapłać teraz</span>
               </Button>
